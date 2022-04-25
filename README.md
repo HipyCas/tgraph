@@ -12,6 +12,7 @@ Plain-simple Rust crate providing for drawing graphs in the terminal based on a 
 - [ ] Option to limit graph height
 - [ ] Interactive graphs: move and zoom
 - [ ] Draw negative values
+- [ ] More ideas to come! Drop yours in the [issues tab](https://github.com/hipycas/tgraph/issues)!
 
 ## Usage
 
@@ -21,7 +22,9 @@ Both structs provide the same interface. To create a graph (used `Graph` for sim
 
 Functions that can be drawn are restricted to types that implement the `tgraph::AsF64` trait, which allows the parameters of the function to be created from a `f64` and the result of the function to be converted to a `f64`, as drawing in the screen is made pixel by pixel. You can implement this trait to whichever type you want, meaning that a struct representing people can be drawn as part of a graph is you implement `tgraph::AsF64` on it.
 
-To write functions for the graph, a `func!` macro is provided, which provides a easy and simple syntax to create function instances easier and provide a more straightforward use of functions in `MultiGraph` (due to the fact that functions/closures with same types have different signatures, so you have to append `as fn(X) -> Y`, where `X` and `Y` are the types of the input and output, respectively). For
+To write functions for the graph, a `func!` macro is provided, which provides a easy and simple syntax to create function instances easier and provide a more straightforward use of functions in `MultiGraph` (due to the fact that functions/closures with same types have different signatures, so you have to append `as fn(X) -> Y`, where `X` and `Y` are the types of the input and output, respectively).
+
+To draw the the graph, it is as simple as calling `.draw()` on `Graph` or `MultiGraph`, and this will draw the graph to the terminal where the binary was executed. Another option that is available, is printing the instance, so if `graph` is your `Graph` or `MultiGraph` instance, `println!("{}", graph)` will print your graph to the screen too (note that debug print will not, just display print).
 
 ## Examples
 
@@ -36,3 +39,22 @@ Graph::with_options_screen(
 )
 .draw();
 ```
+
+Multiple function graph:
+
+```rust
+println!(
+    "{}",
+    MultiGraph::new(
+        vec![
+            func!(x -> 10f64 -(x/5f64)),
+            func!(x -> f64::sin(x/2f64).abs() * 4f64),
+            func!(x -> x.ln()),
+        ],
+        80,
+        None,
+    )
+);
+```
+
+Comparing both examples, you can se the two ways to render the graph, as well as the different ways to declare a function using the `func!` macro.
