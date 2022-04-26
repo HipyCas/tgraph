@@ -5,6 +5,8 @@ use std::fmt;
 use std::iter::successors;
 use typed_builder::TypedBuilder;
 
+use crate::function::Function;
+use crate::traits::AsF64;
 use crate::types::{Character, ColorWrapper};
 
 #[derive(Derivative, TypedBuilder, Debug)]
@@ -19,8 +21,9 @@ pub struct GraphOptions {
   pub height_legend: bool,
 }
 
-pub struct Graph<F: Fn(f64) -> f64> {
-  f: F,
+pub struct Graph /*<X: AsF64, Y: AsF64, F: Fn(X) -> Y>*/ {
+  // f: Function<X, Y, F>,
+  // _f: std::marker::PhantomData<F>,
   widths: GraphWidths,
   height: u32,
   graph_height: u32,
@@ -34,29 +37,32 @@ pub struct GraphWidths {
   pub height_legend: u32,
 }
 
-impl<F> Graph<F>
-where
-  F: Fn(f64) -> f64,
-{
+impl Graph /*<X, Y, F>*/ {
   /// `width` refers to the total width of the graph, meaning that the function will be printed from 0 to `width - 1 - max_height_number_digits`
-  pub fn new(f: F, width: u32, set_height: Option<u32>) -> Graph<F> {
+  pub fn new<X: AsF64, Y: AsF64, F: Fn(X) -> Y>(
+    f: Function<X, Y, F>,
+    width: u32,
+    set_height: Option<u32>,
+  ) -> Graph {
     Graph::with_options(f, width, set_height, GraphOptions::default())
   }
 
-  pub fn new_screen(f: F) -> Graph<F> {
+  pub fn new_screen<X: AsF64, Y: AsF64, F: Fn(X) -> Y>(f: Function<X, Y, F>) -> Graph {
     Graph::with_options_screen(f, GraphOptions::default())
   }
 
-  pub fn with_options(
-    f: F,
+  pub fn with_options<X: AsF64, Y: AsF64, F: Fn(X) -> Y>(
+    f: Function<X, Y, F>,
     width: u32,
     set_height: Option<u32>,
     options: GraphOptions,
-  ) -> Graph<F> {
+  ) -> Graph {
     // Generate function (x, y) pairs
-    let mut pts = (0..width)
-      .map(|x| (x as f64, f(x as f64)))
-      .collect::<Vec<(f64, f64)>>();
+    let mut pts: Vec<(f64, f64)> = f
+      .rng_x(0, width)
+      .into_iter()
+      .map(|(x, y)| (x.as_f64(), y))
+      .collect();
     // Get max y
     let max = pts
       .iter()
@@ -74,7 +80,7 @@ where
       None => max + 1,
     };
     Graph {
-      f,
+      // f,
       widths: GraphWidths {
         total: width,
         graph: width - max_height_digits,
@@ -87,7 +93,10 @@ where
     }
   }
 
-  pub fn with_options_screen(f: F, options: GraphOptions) -> Graph<F> {
+  pub fn with_options_screen<X: AsF64, Y: AsF64, F: Fn(X) -> Y>(
+    f: Function<X, Y, F>,
+    options: GraphOptions,
+  ) -> Graph {
     let w_screen = console_engine::crossterm::terminal::size().unwrap().0;
     Graph::with_options(f, w_screen as u32, None, options)
   }
@@ -157,7 +166,7 @@ where
   }
 }
 
-impl<F: Fn(f64) -> f64> fmt::Display for Graph<F> {
+impl fmt::Display for Graph {
   fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
     self.draw();
     Ok(())
