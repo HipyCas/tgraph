@@ -14,6 +14,8 @@ pub use crate::multi_graph::*;
 pub use crate::traits::AsF64;
 pub use crate::types::{Character, ColorWrapper};
 
+pub use console_engine::Color;
+
 #[doc(hidden)]
 pub fn draw<F: Fn(u32) -> u32>(f: F, character: Character) {
   // Set width
