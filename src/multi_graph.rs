@@ -162,9 +162,7 @@ impl<X: AsF64, Y: AsF64, F: Fn(X) -> Y> MultiGraph<X, Y, F> {
           (self.graph_height - y) as i32, // TODO Allow selecting approximation method: round, ceil or cast (as)
           // Can also put a space (or empty box or something) and color bg
           pixel::pxl_fg(
-            unsafe {
-              std::char::from_u32_unchecked(self.options.0.get(i).unwrap().character as u32)
-            },
+            self.options.0.get(i).unwrap().character.as_char(),
             self.options.0.get(i).unwrap().color.into(),
           ),
         )

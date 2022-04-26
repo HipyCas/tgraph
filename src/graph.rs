@@ -157,10 +157,7 @@ impl Graph /*<X, Y, F>*/ {
         *x as i32 + self.widths.height_legend as i32,
         (self.graph_height as f64 - y).round() as i32, // TODO Allow selecting approximation method: round, ceil or cast (as)
         // Can also put a space (or empty box or something) and color bg
-        pixel::pxl_fg(
-          unsafe { std::char::from_u32_unchecked(self.options.character as u32) },
-          self.options.color.into(),
-        ),
+        pixel::pxl_fg(self.options.character.as_char(), self.options.color.into()),
       )
     }
   }
