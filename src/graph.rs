@@ -21,9 +21,7 @@ pub struct GraphOptions {
   pub height_legend: bool,
 }
 
-pub struct Graph /*<X: AsF64, Y: AsF64, F: Fn(X) -> Y>*/ {
-  // f: Function<X, Y, F>,
-  // _f: std::marker::PhantomData<F>,
+pub struct Graph {
   widths: GraphWidths,
   height: u32,
   graph_height: u32,
@@ -37,7 +35,7 @@ pub struct GraphWidths {
   pub height_legend: u32,
 }
 
-impl Graph /*<X, Y, F>*/ {
+impl Graph {
   /// `width` refers to the total width of the graph, meaning that the function will be printed from 0 to `width - 1 - max_height_number_digits`
   pub fn new<X: AsF64, Y: AsF64, F: Fn(X) -> Y>(
     f: Function<X, Y, F>,
@@ -102,10 +100,6 @@ impl Graph /*<X, Y, F>*/ {
   }
 
   pub fn draw(&self) {
-    // draw(
-    //   |x| (self.f)(x as f64).round() as u32,
-    //   self.options.character,
-    // )
     let mut scr = Screen::new(self.widths.total, self.height);
 
     self.draw_axis(&mut scr);
@@ -148,11 +142,6 @@ impl Graph /*<X, Y, F>*/ {
   fn draw_function(&self, scr: &mut Screen) {
     // Draw points
     for (x, y) in self.pts.iter() {
-      // println!(
-      //   "x: {}; y: {}",
-      //   x as i32,
-      //   (height - *y.get((x - max_height_digits) as usize).unwrap()) as i32,
-      // );
       scr.set_pxl(
         *x as i32 + self.widths.height_legend as i32,
         (self.graph_height as f64 - y).round() as i32, // TODO Allow selecting approximation method: round, ceil or cast (as)

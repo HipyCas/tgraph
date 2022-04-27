@@ -6,7 +6,6 @@ use crate::AsF64;
 #[derive(Derivative)]
 #[derivative(Debug)]
 pub struct Function<X: AsF64, Y: AsF64, F: Fn(X) -> Y> {
-  // #[derivative(Debug(format_with = "closure_fmt"))]
   #[derivative(Debug = "ignore")]
   f: F,
   #[derivative(Debug = "ignore")]
@@ -14,13 +13,6 @@ pub struct Function<X: AsF64, Y: AsF64, F: Fn(X) -> Y> {
   #[derivative(Debug = "ignore")]
   _y: PhantomData<Y>,
 }
-
-// fn closure_fmt<X: AsF64, Y: AsF64, F: Fn(X) -> Y>(
-//   f: &F,
-//   fmt: &mut std::fmt::Formatter,
-// ) -> Result<(), std::fmt::Error> {
-//   // fmt.write_str(crate::function::_closure_fmt!(f))
-// }
 
 impl<X: AsF64, Y: AsF64, F: Fn(X) -> Y> Function<X, Y, F> {
   pub fn new(f: F) -> Function<X, Y, F> {
@@ -98,12 +90,5 @@ macro_rules! func {
   };
   ($x4:ident -> $code4:expr => [$yt1:ty]) => {
     Function::new(|$x4: f64| -> $yt1 { $code4 } as fn(f64) -> $yt1)
-  };
-}
-
-#[macro_export]
-macro_rules! closure_fmt {
-  ($closure:expr) => {
-    stringify!($closure)
   };
 }

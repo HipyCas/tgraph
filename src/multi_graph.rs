@@ -129,7 +129,7 @@ impl<X: AsF64, Y: AsF64, F: Fn(X) -> Y> MultiGraph<X, Y, F> {
       0,
       self.height as i32,
       pixel::pxl('|'),
-    ); // looks like top boundary is not included
+    );
   }
 
   fn draw_height_legend(&self, scr: &mut Screen) {
@@ -152,11 +152,6 @@ impl<X: AsF64, Y: AsF64, F: Fn(X) -> Y> MultiGraph<X, Y, F> {
         .into_iter()
         .map(|(x, y)| (x, y.round() as u32))
       {
-        // println!(
-        //   "x: {}; y: {}",
-        //   x as i32,
-        //   (height - *y.get((x - max_height_digits) as usize).unwrap()) as i32,
-        // );
         scr.set_pxl(
           (x + self.widths.height_legend) as i32,
           (self.graph_height - y) as i32, // TODO Allow selecting approximation method: round, ceil or cast (as)
