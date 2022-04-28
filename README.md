@@ -1,4 +1,4 @@
-![Easy print multiple functions](https://raw.githubusercontent.com/HipyCas/tgraph/master/multi_graph.png)
+![Easy print multiple functions](https://raw.githubusercontent.com/HipyCas/tgraph/master/docs/multi_graph.png)
 
 # `tgraph`
 
