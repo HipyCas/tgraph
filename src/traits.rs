@@ -46,3 +46,25 @@ impl AsF64 for f64 {
     v
   }
 }
+
+pub trait MaybeAsF64 {
+  fn maybe_as_f64(self) -> Option<f64>;
+}
+
+impl<T> MaybeAsF64 for T
+where
+  T: AsF64,
+{
+  fn maybe_as_f64(self) -> Option<f64> {
+    Some(self.as_f64())
+  }
+}
+
+impl<T> MaybeAsF64 for Option<T>
+where
+  T: AsF64,
+{
+  fn maybe_as_f64(self) -> Option<f64> {
+    self.map(|v| v.as_f64())
+  }
+}
