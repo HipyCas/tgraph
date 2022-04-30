@@ -1,5 +1,7 @@
-use tgraph::{func, Function, MultiGraph};
+use tgraph::{func, MultiGraph};
 
+/// We define a graph with 3 functions in it
+/// each function is defined with the func! macro
 fn main() {
     println!(
         "{}",
