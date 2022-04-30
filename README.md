@@ -1,4 +1,4 @@
-![Easy print multiple functions](https://raw.githubusercontent.com/HipyCas/tgraph/master/multi_graph.png)
+![Easy print multiple functions](https://raw.githubusercontent.com/HipyCas/tgraph/master/docs/multi_graph.png)
 
 # `tgraph`
 
@@ -69,3 +69,10 @@ println!(
 ```
 
 Comparing both examples, you can se the two ways to render the graph, as well as the different ways to declare a function using the `func!` macro.
+
+You can run these example directly with
+```shell
+cargo run --example single_graph
+# and
+cargo run --example multi_graph
+```
