@@ -7,7 +7,7 @@ use typed_builder::TypedBuilder;
 
 use crate::function::Function;
 use crate::traits::AsF64;
-use crate::types::{Character, ColorWrapper};
+use crate::types::{Character, ColorWrapper, Scales};
 
 #[derive(Derivative, TypedBuilder, Debug)]
 #[derivative(Default)]
@@ -19,6 +19,9 @@ pub struct GraphOptions {
   #[derivative(Default(value = "true"))]
   #[builder(default = true)]
   pub height_legend: bool,
+  #[derivative(Default)]
+  #[builder(default, setter(into))]
+  pub scales: Scales,
 }
 
 pub struct Graph {
@@ -57,7 +60,7 @@ impl Graph {
   ) -> Graph {
     // Generate function (x, y) pairs
     let mut pts: Vec<(f64, f64)> = f
-      .rng_x(0, width)
+      .rng_x_scale(0, width, &options.scales) // TODO Change this to have a Scales struct in options.scales
       .into_iter()
       .map(|(x, y)| (x.as_f64(), y))
       .collect();
@@ -128,11 +131,13 @@ impl Graph {
   }
 
   fn draw_height_legend(&self, scr: &mut Screen) {
-    for h in 0..=self.graph_height {
+    for h in (0..=self.graph_height).map(|y| (y as f64 * self.options.scales.x).round()) {
       for (index, digit) in h.to_string().chars().enumerate() {
         scr.set_pxl(
           index as i32,
-          (self.graph_height - h) as i32,
+          (self.graph_height as f64 - h / self.options.scales.y)
+            .max(0f64)
+            .round() as i32,
           pixel::pxl(digit),
         );
       }
@@ -143,8 +148,8 @@ impl Graph {
     // Draw points
     for (x, y) in self.pts.iter() {
       scr.set_pxl(
-        *x as i32 + self.widths.height_legend as i32,
-        (self.graph_height as f64 - y).round() as i32, // TODO Allow selecting approximation method: round, ceil or cast (as)
+        (x / self.options.scales.x) as i32 + self.widths.height_legend as i32,
+        (self.graph_height as f64 - (y)).round() as i32, // TODO Allow selecting approximation method: round, ceil or cast (as)
         // Can also put a space (or empty box or something) and color bg
         pixel::pxl_fg(self.options.character.as_char(), self.options.color.into()),
       )

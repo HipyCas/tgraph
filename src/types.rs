@@ -101,3 +101,27 @@ impl Into<Color> for ColorWrapper {
     self.0
   }
 }
+
+#[derive(Derivative)]
+#[derivative(Default, Debug)]
+pub struct Scales {
+  #[derivative(Default(value = "1f64"))]
+  pub x: f64,
+  #[derivative(Default(value = "1f64"))]
+  pub y: f64,
+}
+
+impl From<(f64, f64)> for Scales {
+  fn from((x, y): (f64, f64)) -> Scales {
+    Scales { x, y }
+  }
+}
+
+impl From<(Option<f64>, Option<f64>)> for Scales {
+  fn from((maybe_x, maybe_y): (Option<f64>, Option<f64>)) -> Scales {
+    Scales {
+      x: maybe_x.unwrap_or(1f64),
+      y: maybe_y.unwrap_or(1f64),
+    }
+  }
+}

@@ -1,7 +1,8 @@
 use derivative::Derivative;
 use std::marker::PhantomData;
 
-use crate::AsF64;
+use crate::traits::AsF64;
+use crate::types::Scales;
 
 #[derive(Derivative)]
 #[derivative(Debug)]
@@ -43,6 +44,17 @@ impl<X: AsF64, Y: AsF64, F: Fn(X) -> Y> Function<X, Y, F> {
       .map(|x| (x, (self.f)(X::from_f64(x.as_f64())).as_f64()))
       .collect()
   }
+
+  pub fn rng_x_scale(&self, x_i: u32, x_f: u32, scales: &Scales) -> Vec<(f64, f64)> {
+    (x_i..=x_f)
+      .map(|x| {
+        (
+          x as f64 * scales.x,
+          (self.f)(X::from_f64(x.as_f64() * scales.x)).as_f64() * scales.y,
+        )
+      })
+      .collect()
+  }
 }
 
 impl<X: AsF64 + Copy, Y: AsF64, F: Fn(X) -> Y> IntoIterator for Function<X, Y, F> {
@@ -71,24 +83,41 @@ impl<X: AsF64 + Copy, Y: AsF64, F: Fn(X) -> Y> Iterator for FunctionIntoIterator
   }
 }
 
+/// A handy macro for creating [`Function`] instances easier.
+///
+/// This macro has three possible syntaxes for defining functions: closure-like, raw and arrow. It casts the created closure to `fn($x_type) -> $y_type` to ensure that they have the same type signature (needed for usage in [`MultiGraph`](struct.MultiGraph.html) ).
+///
+/// The first of them is just the same syntax as a simple closure, without possible type annotations, as the type is to be set to `f64`. On the other hand, you have the raw syntax, which allows basically anything, included a typed closure, but casting to an `fn(T) -> U` is required when using [`MultiGraph`](struct.MultiGraph.html) so all functions have the same signature. An example usage is the following:
+///
+/// ```
+/// use tgraph::{MultiGraph, func};
+///
+/// fn main() {
+///   MultiGraph::new_screen(vec![
+///     func!(|x| f64::sin(x/2f64).abs() * 4f64),
+///     func!(|x: f64| -> f64 {x.ln()} as fn(f64) -> f64),
+///   ]).draw();
+/// }
+/// ```
+///
 #[macro_export]
 macro_rules! func {
   (|$x:ident| $code:expr) => {
-    Function::new(|$x: f64| -> f64 { $code } as fn(f64) -> f64)
+    tgraph::Function::new(|$x: f64| -> f64 { $code } as fn(f64) -> f64)
   };
   ($e:expr) => {
-    Function::new($e)
+    tgraph::Function::new($e)
   };
-  ($x1:ident -> $code1:expr) => {
-    Function::new(|$x1: f64| -> f64 { $code1 } as fn(f64) -> f64)
+  ($x:ident -> $code:expr) => {
+    tgraph::Function::new(|$x: f64| -> f64 { $code } as fn(f64) -> f64)
   };
-  ($x2:ident [$xt:ty] -> $code2:expr) => {
-    Function::new(|$x2: $xt| -> f64 { $code2 } as fn($xt) -> f64)
+  ($x:ident [$xt:ty] -> $code:expr) => {
+    tgraph::Function::new(|$x: $xt| -> f64 { $code } as fn($xt) -> f64)
   };
-  ($x3:ident [$xt1:ty] -> $code3:expr => [$yt:ty]) => {
-    Function::new(|$x3: $xt1| -> $yt { $code3 } as fn($xt1) -> $yt)
+  ($x:ident [$xt:ty] -> $code:expr => [$yt:ty]) => {
+    tgraph::Function::new(|$x: $xt| -> $yt { $code } as fn($xt) -> $yt)
   };
-  ($x4:ident -> $code4:expr => [$yt1:ty]) => {
-    Function::new(|$x4: f64| -> $yt1 { $code4 } as fn(f64) -> $yt1)
+  ($x:ident -> $code:expr => [$yt:ty]) => {
+    tgraph::Function::new(|$x: f64| -> $yt { $code } as fn(f64) -> $yt)
   };
 }
