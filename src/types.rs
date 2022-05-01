@@ -19,7 +19,7 @@ pub enum Character {
     CyrillicZhe,
     /// Unicode Cyrillic millions character (    ҉ )
     CyrillicMillions,
-    /// Unicode Cyrillic hundred thousands character (    ҈ )        
+    /// Unicode Cyrillic hundred thousands character (    ҈ )
     CyrillicHundredThousands,
     /// Unicode bullet character (•)
     Bullet,

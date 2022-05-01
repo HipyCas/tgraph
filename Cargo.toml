@@ -1,11 +1,11 @@
 [package]
 authors = ["Hipy Cas <hipycas@gmail.com>"]
 categories = [
-  "command-line-interface",
-  "graphics",
-  "mathematics",
-  "science",
-  "visualization",
+    "command-line-interface",
+    "graphics",
+    "mathematics",
+    "science",
+    "visualization",
 ]
 description = "A simple terminal graphing library"
 edition = "2021"
